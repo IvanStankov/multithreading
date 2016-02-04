@@ -10,21 +10,21 @@ import java.util.concurrent.CountDownLatch;
  */
 public class Main {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         CountDownLatch start = new CountDownLatch(1);
+        CountDownLatch finish = new CountDownLatch(3);
 
         List<Thread> threads = new ArrayList<>();
-        threads.add(new Thread(new Car("Chevrolet", start)));
-        threads.add(new Thread(new Car("Volkswagen", start)));
-        threads.add(new Thread(new Car("Lada sedan", start)));
+        threads.add(new Thread(new Car("Chevrolet", start, finish)));
+        threads.add(new Thread(new Car("Volkswagen", start, finish)));
+        threads.add(new Thread(new Car("Lada sedan", start, finish)));
         threads.forEach(Thread::start);
 
         start.countDown();
         disqualify(threads);
 
-        CountDownLatch finish = new CountDownLatch(threads.size());
-
-        System.out.println("Winner is ");
+        finish.await();
+        System.out.println("Winner is " + Car.arrivals.get(0));
     }
 
     private static void disqualify(List<Thread> threads) {
